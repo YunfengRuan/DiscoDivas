@@ -11,7 +11,6 @@ dis.list <- vector()
 for (i in seq(N*N)){
 row = (i-1) %/% N +1
 col = (i-1) %% N +1 
-print(paste(row, "-", col))
 dis.list[i] <- Euclidean(med[row,], med[col,])
 }
 dis.list <- unlist(dis.list)
