@@ -43,19 +43,19 @@ target.pca <- data.frame(fread(pca.file, header = T))
 npca2 = ncol(target.pca) - 1
 
 if(min(npca1) < 5) {
-print("Fewer than 5 top PCs in med.file. May lead to inefficient genetic distance calculation! ")}
+cat("\nFewer than 5 top PCs in med.file. May lead to inefficient genetic distance calculation! \n")}
 if(min(npca2) < 5) {
-print("Fewer than 5 top PCs in prs.file. May lead to inefficient genetic distance calculation! ")}
+cat("\nFewer than 5 top PCs in prs.file. May lead to inefficient genetic distance calculation! \n")}
 npca = min(npca1, npca2)
 if ( npca < 3) {
-print("Too few top PCs. Please check the input")
+cat("\nToo few top PCs. Please check the input \n")
 Good.Input=F}
 
 cat("\ncheck the number of fine-tuning cohorts\n")
 med <- Med[, 2:ncol(Med)]
 base.list <- as.matrix(Med)[, 1]
 N <- length(base.list)
-print(paste("The combined PRS based on PRS fine-tuned in", N, "cohorts."))
+cat(paste("\nThe combined PRS based on PRS fine-tuned in", N, "cohorts.\n"))
 print(base.list)
 if (N<=1) {
 cat("\nPlease provide 2 or more PRS to combine\n")
@@ -81,20 +81,19 @@ cat("\ncheck the header to select from the PRS files\n")
 select.col <- unlist(strsplit(select.col, ","))
 if (length(select.col) == 2*N) {select.col <- select.col
 } else if (length(select.col) == 2) {select.col <- rep(select.col, N)
-} else {print("Please check the --selectcol. Incorrect input")
+} else {cat("\nPlease check the --selectcol. Incorrect input\n")
 Good.Input=F}
 
 ##### Finish checking the Input #####
 
 if (Good.Input==F) {
-stop("The input is incorrect and the program will be stopped. Please check!")
+stop("The input is incorrect and the program is stopped. Please re-check your input!")
 } else {
 cat("\nStart to calculate!")
 
 cat("\ngenerate the shrinkage parameter depends on the genetic distance of fine-tuning cohorts\n")
 d <- shrinkage.vector(med, npca)
 
-# 
 cat("\nCalculate genetic distance between fine-tuning cohorts and individuals in testing cohort\n")
 colnames(target.pca) <- c("IID", paste0("PC", seq(npca1)))
 mat <- target.pca[, 2:ncol(target.pca)]
@@ -113,11 +112,11 @@ w.matrix <- cbind(w.matrix, w)}
 w.sum <- rowSums(w.matrix)
 
 IID <- target.pca$IID
-aa.matrix <- cbind(IID)
+a.matrix <- cbind(IID)
 for (i in seq(N)) {
-aa <- w.matrix[,i]/w.sum
-aa.matrix <- cbind(aa.matrix, aa)}
-colnames(aa.matrix) <- c("IID", paste0(base.list, ".a"))
+a <- w.matrix[,i]/w.sum
+a.matrix <- cbind(a.matrix, a)}
+colnames(a.matrix) <- c("IID", paste0(base.list, ".a"))
 
 cat("\nGather PRS to combine\n")
 prs.matrix <- fread(prs.list[1], select=select.col[c(1,2)])
@@ -127,13 +126,14 @@ score <- fread(prs.list[i], select=select.col[c(2*i-1, 2*i)])
 colnames(score) <- c("IID", base.list[i])
 prs.matrix <- merge(prs.matrix, score)}
 Nprs <- nrow(prs.matrix)
-print(paste("Read PRS for", Nprs, "individuals"))
+cat(paste("\nRead PRS for", Nprs, "individuals\n"))
 Npca <- nrow(target.pca)
-print(paste("Read PCA for", Npca, "individuals"))
+cat(paste("\nRead PCA for", Npca, "individuals\n"))
 
 dat <- merge(prs.matrix, target.pca, by="IID")
 Ndat <- nrow(dat)
-print(paste(Ndat, "individuals have PRS and PCA information"))
+cat(paste("\n", Ndat, "individuals have PRS and PCA information\n"))
+  
 if (Ndat < 0.4*min(Nprs, Npca)){
 cat("\nWarning: the overlap between PRS and PCA information is too small. Please check input")}
 if (Ndat==0) {
@@ -157,4 +157,5 @@ out.dat <- cbind(IID, prs)
 colnames(out.dat) <- c("IID", "PRS")
 export(out.dat, paste0(out, ".tsv.gz"), quote = F)
 cat("\nPRS combined! \n  Y(^ W ^)Y  \n")}
+cat(paste0("Result is written to ", out, ".tsv.gz\n"))
 }
