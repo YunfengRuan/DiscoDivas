@@ -129,14 +129,14 @@ mat <- target.pca[, 2:ncol(target.pca)]
 
 dis.matrix <- data.frame(matrix(,nrow=nrow(target.pca),ncol=0))
 for (i in seq(N)) {
-dis <- Euclidean.matrix(mat, med[i,])
+dis <- Euclidean.matrix(mat, med[i,], npca)
 dis.matrix <- cbind(dis.matrix, dis)}
 colnames(dis.matrix) <- c(base.list)
 
 cat("\nCalculate weight to combine PRS for individuals in testing cohort\n") 
 w.matrix <- data.frame(matrix(,nrow=nrow(target.pca),ncol=0))
 for (i in seq(N)) {
-w <- a[i]*A[i]/dis.matrix[,i]
+w <- d[i]*A[i]/dis.matrix[,i]
 w.matrix <- cbind(w.matrix, w)}
 w.sum <- rowSums(w.matrix)
 
