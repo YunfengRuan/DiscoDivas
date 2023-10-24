@@ -3,7 +3,7 @@ library(dplyr)
 library(stringr)
 library(rio)
 library(optparse)
-source("./function.r")
+source("./functions.r")
 
 option_list = list(
   make_option(c("-m", "--med.file"), type="character", default=NULL,
