@@ -23,18 +23,23 @@ option_list = list(
               help="the output name prefix", metavar="character")
 );
 
+opt_parser = OptionParser(option_list=option_list);
+opt = parse_args(opt_parser);
 
-# med.file <- "/medpop/esp2/yruan/projects/pca.adjusted.effect/mgbb.pca.med.1000G.tsv"
-# pca.file <- "/medpop/esp2/yruan/projects/pca.adjusted.effect/g1000.pca/ukbb.g1000_5pop.hm3.pruned.scores.txt.gz"
-# prslist <- "/medpop/esp2/yruan/projects/zyu.qt.traits/data/prs.ukbb.from.mgbb/CAD.AFR.scores.txt.gz,/medpop/esp2/yruan/projects/zyu.qt.traits/data/prs.ukbb.from.mgbb/CAD.EAS.scores.txt.gz,/medpop/esp2/yruan/projects/zyu.qt.traits/data/prs.ukbb.from.mgbb/CAD.EUR.scores.txt.gz,/medpop/esp2/yruan/projects/zyu.qt.traits/data/prs.ukbb.from.mgbb/CAD.SAS.scores.txt.gz"
+med.file <- opt$med.file
+pca.file <- opt$pca.file
+prs.list <- opt$prs.list
+a.list <- opt$a.list
+select.col <- opt$select.col
+out <- opt$out
 
 cat("\ncheck the input:\n")
 Good.Input=TRUE
 
 cat("\ncheck the number of PCA:\n")
-Med <- data.frame(fread(med.file), header = T)
+Med <- data.frame(fread(med.file, header = T))
 npca1 = ncol(Med) - 1
-target.pca <- data.frame(fread(pca.file), header = T )
+target.pca <- data.frame(fread(pca.file, header = T))
 npca2 = ncol(target.pca) - 1
 
 if(min(npca1) < 5) {
@@ -46,12 +51,11 @@ if ( npca < 3) {
 print("Too few top PCs. Please check the input")
 Good.Input=F}
 
-
 cat("\ncheck the number of fine-tuning cohorts\n")
 med <- Med[, 2:ncol(Med)]
 base.list <- as.matrix(Med)[, 1]
 N <- length(base.list)
-print(paste0("The combine PRS based on ",N, " cohorts."))
+print(paste("The combined PRS based on PRS fine-tuned in", N, "cohorts."))
 print(base.list)
 if (N<=1) {
 cat("\nPlease provide 2 or more PRS to combine\n")
@@ -62,18 +66,20 @@ cat("\nPlease provide list of PRS to combine\n")
 Good.Input=F } else {
 prs.list <- unlist(strsplit(prs.list, ","))}
 
-if (is.null(A)) { A <- rep(1, N)} else {
+cat("\ncheck the sele-defined shrinkage parameters\n")
+if (is.null(a.list)) { A <- rep(1, N)} else {
 A <- as.numeric(unlist(strsplit(a.list, ",")))}
-if (any(is.na(A)) | any(A < 0) {
+if (any(is.na(A)) | any(A< 0) ) {
 cat("Error: Unexpected value in the a.list. Please check input \n")
 Good.Input=F}
 
-if (length(prs.list)!=N | length(a.list)!=N) {
+if (length(prs.list)!=N | length(A)!=N) {
 cat("Error: Inconsistent numbers of fine tuning cohorts. Please check input\n")
 Good.Input=F}
 
 cat("\ncheck the header to select from the PRS files\n")
-if (length(select.col) == 2*n) {select.col <- select.col
+select.col <- unlist(strsplit(select.col, ","))
+if (length(select.col) == 2*N) {select.col <- select.col
 } else if (length(select.col) == 2) {select.col <- rep(select.col, N)
 } else {print("Please check the --selectcol. Incorrect input")
 Good.Input=F}
@@ -85,8 +91,8 @@ stop("The input is incorrect and the program will be stopped. Please check!")
 } else {
 cat("\nStart to calculate!")
 
-# generate the shrinkage parameter depends on the genetic distance of fine-tuning cohorts
-a <- shrinkage.vector(med)
+cat("\ngenerate the shrinkage parameter depends on the genetic distance of fine-tuning cohorts\n")
+d <- shrinkage.vector(med, npca)
 
 # 
 cat("\nCalculate genetic distance between fine-tuning cohorts and individuals in testing cohort\n")
@@ -107,11 +113,11 @@ w.matrix <- cbind(w.matrix, w)}
 w.sum <- rowSums(w.matrix)
 
 IID <- target.pca$IID
-a.matrix <- cbind(IID)
+aa.matrix <- cbind(IID)
 for (i in seq(N)) {
-a <- w.matrix[,i]/w.sum
-a.matrix <- cbind(a.matrix, a)}
-colnames(a.matrix) <- c("IID", paste0(base.list, ".a"))
+aa <- w.matrix[,i]/w.sum
+aa.matrix <- cbind(aa.matrix, aa)}
+colnames(aa.matrix) <- c("IID", paste0(base.list, ".a"))
 
 cat("\nGather PRS to combine\n")
 prs.matrix <- fread(prs.list[1], select=select.col[c(1,2)])
