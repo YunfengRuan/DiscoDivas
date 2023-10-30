@@ -4,6 +4,8 @@ library(stringr)
 library(rio)
 library(optparse)
 
+## define functions ##
+
 Euclidean <- function(vec1, vec2, n) {
 sqr.sum = 0
 for (i in seq(n)) {sqr.sum <- sqr.sum + (vec1[i]-vec2[i])^2}
@@ -32,8 +34,9 @@ A <- matrix(dis.list, nrow=N, byrow=TRUE)
 A.inv <- solve(A)
 a <- A.inv %*% rep(1,N)
 return(a)}
+## finish defining function ##
 
-
+## read options from command line ##
 option_list = list(
   make_option(c("-m", "--med.file"), type="character", default=NULL,
               help="the file that contains the median of PC of the fine-tuning cohort. Have header. 1st row is cohort name",
@@ -49,7 +52,9 @@ option_list = list(
   make_option(c("-s", "--select.col"), type="character", default=NULL,
               help="the IID and PRS column in the prs files. Separate items with , ", metavar="character"),
   make_option(c("-o", "--out"), type="character", default=NULL,
-              help="the output name prefix", metavar="character")
+              help="the output name prefix", metavar="character"),
+  make_option(c("--regress.PCA"), type="logical", default=TRUE,
+              help="choose weather regress out PCA from the PRS before combining them", metavar="character")
 );
 
 opt_parser = OptionParser(option_list=option_list);
@@ -61,6 +66,7 @@ prs.list <- opt$prs.list
 a.list <- opt$a.list
 select.col <- opt$select.col
 out <- opt$out
+regress.PCA <- as.logical(opt$regress.PCA)
 
 cat("\ncheck the input:\n")
 Good.Input=TRUE
@@ -111,6 +117,10 @@ select.col <- unlist(strsplit(select.col, ","))
 if (length(select.col) == 2*N) {select.col <- select.col
 } else if (length(select.col) == 2) {select.col <- rep(select.col, N)
 } else {cat("\nPlease check the --selectcol. Incorrect input\n")
+Good.Input=F}
+
+if (is.na(regress.PCA)) {
+cat("\n--regress.PCA has invalid value. The correct input should be TRUE, T or FALSE, F. Please check.\n" )
 Good.Input=F}
 
 ##### Finish checking the Input #####
@@ -168,6 +178,8 @@ cat("\nWarning: the overlap between PRS and PCA information is too small. Please
 if (Ndat==0) {
 stop("No overlap between PRS and PCA information")} else {
 cat("\n Calculate combined PRS\n")
+
+if (regress.PCA){
 IID <- dat$IID
 prs.res.matrix <- cbind(IID)
 for (i in seq(N)) {
@@ -175,7 +187,9 @@ prs.res <- resid(glm(lm(formula = as.formula(paste(base.list[i], " ~", paste(pas
 prs.res.matrix <- cbind(prs.res.matrix, prs.res)}
 colnames(prs.res.matrix) <- c("IID", paste0(base.list, ".res"))
 
-dat <- merge(prs.res.matrix, a.matrix, by= "IID")
+dat <- merge(prs.res.matrix, a.matrix, by= "IID") 
+} else {
+dat <- merge(prs.matrix, a.matrix, by= "IID") 
 
 prs <- rep(0, nrow(dat))
 for (i in seq(N)) {
