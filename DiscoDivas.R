@@ -189,7 +189,7 @@ colnames(prs.res.matrix) <- c("IID", paste0(base.list, ".res"))
 
 dat <- merge(prs.res.matrix, a.matrix, by= "IID") 
 } else {
-dat <- merge(prs.matrix, a.matrix, by= "IID") 
+dat <- merge(prs.matrix, a.matrix, by= "IID") }
 
 prs <- rep(0, nrow(dat))
 for (i in seq(N)) {
@@ -201,4 +201,4 @@ colnames(out.dat) <- c("IID", "PRS")
 export(out.dat, paste0(out, ".tsv.gz"), quote = F)
 cat("\nPRS combined! \n  Y(^ W ^)Y  \n")}
 cat(paste0("Result is written to ", out, ".tsv.gz\n"))
-}}
+}
