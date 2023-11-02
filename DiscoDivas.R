@@ -123,12 +123,12 @@ if (is.na(regress.PCA)) {
 cat("\n--regress.PCA has invalid value. The correct input should be TRUE, T or FALSE, F. Please check.\n" )
 Good.Input=F}
 
-##### Finish checking the Input #####
+cat("\n##### Finish checking the Input #####\n")
 
 if (Good.Input==F) {
-stop("The input is incorrect and the program is stopped. Please re-check your input!")
+cat("The input is incorrect and the program is stopped. Please re-check your input!")
 } else {
-cat("\nStart to calculate!")
+cat("\nStart to calculate...\n")
 
 cat("\ngenerate the shrinkage parameter depends on the genetic distance of fine-tuning cohorts\n")
 d <- shrinkage.vector(med, npca)
@@ -201,4 +201,4 @@ colnames(out.dat) <- c("IID", "PRS")
 export(out.dat, paste0(out, ".tsv.gz"), quote = F)
 cat("\nPRS combined! \n  Y(^ W ^)Y  \n")}
 cat(paste0("Result is written to ", out, ".tsv.gz\n"))
-}
+}}
