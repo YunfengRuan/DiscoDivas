@@ -1,7 +1,7 @@
 # DiscoDivas
 
 ## Disambiguation
-This page is for "a Genetic ***Dis***tance-assisted PRS ***Co***mbination Pipeline for ***Div***erse Genetic ***A***ncestrie***s***, an R script for calculating PRS. 
+This page is for "a Genetic ***Dis***tance-assisted PRS ***Co***mbination Pipeline for ***Div***erse Genetic ***A***ncestrie***s***, an R script for calculating PRS for diverse populations, especially admixed populations. 
 
 For the album of disco music, please refer to this [spotify page](https://open.spotify.com/album/511A9pZXN4GhblH021gdDS)
 
