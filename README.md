@@ -5,7 +5,7 @@ This page is for "a Genetic ***Dis***tance-assisted PRS ***Co***mbination Pipeli
 
 For the album of disco music, please refer to this [spotify page](https://open.spotify.com/album/511A9pZXN4GhblH021gdDS)
 
-## required R packages
+## Required R packages
 - data.table
 - dplyr
 - stringr
@@ -26,9 +26,10 @@ Rscript DiscoDivas.R -m ukbb.pca.med.1000G.tsv \
 ```
 - `-m ukbb.pca.med.1000G.tsv`
   
-  `ukbb.pca.med.1000G.tsv`can be found in the `files`. **Please notice that the order of the list after `-A` and `--prs.list` should be the same as the order in this file.** User can replace it by other file that contains the median value of top PC of the validation cohorts actually being used in the analysis.
+  `ukbb.pca.med.1000G.tsv`can be found in the `files`. **Please notice that the order of the list after `-A` and `--prs.list` should has the same the order as the order of cohorts/ populations in this file.** User should replace the file by other file that contains the median value of top PC of the validation cohorts actually being used in the analysis.
+  
   The format should be: 
-  - has a header; does't contain row name or row index;
+  - must have a header; does't contain row name or row index;
   - the first column is the name of cohorts or populations; the seconds column and other columns after that are PCs
 ```
   POP	PC1	PC2	PC3	PC4	PC5	PC6	PC7	PC8	PC9	PC10
@@ -40,15 +41,17 @@ Rscript DiscoDivas.R -m ukbb.pca.med.1000G.tsv \
     
 - `-p ukbb.pca.txt.gz`
 
-  `ukbb.pca.txt.gz` should be replaced by user's file contains the PC of the testing individual. The format is:
-  - has a header; does't contain row name or row index;
+  `ukbb.pca.txt.gz` should be replaced by user's file contains the PC of the testing individual. It can be plain text file or `.gz` file. **Please notice that in all the list, items should be separated by `,` and no space should be inserted.**
+
+  The format is:
+  - must have header; does't contain row name or row index;
   - the first column is the individual ID; the seconds column and other columns after that are PCs
 
 - `--prs.list afr.prs.tsv.gz,${wd}/sas.prs.tsv.gz,eas.prs.tsv.gz,eur.prs.tsv.gz`
 
   The list of PRS files of the testing cohort that are based on the weight fine-tuned in each of the validation cohorts. They can be plain text file or `.gz` file. The format is:
-  - has a header; does't contain row name or row index;
-  - has a column of individual ID and a column of PRS
+  - must have header; does't contain row name or row index;
+  - must have a column of individual ID and a column of PRS
   - The individual ID in the PRS files should be the same as the individual ID in the PCA file
 
 - `-s IID,PRS`
@@ -67,7 +70,8 @@ Rscript DiscoDivas.R -m ukbb.pca.med.1000G.tsv \
   The prefix of output file. The format of output file is `.tsv.gz`
 
 
-
+## Supporting files
+Please visit `files` for the suppporting files
 
 
 
