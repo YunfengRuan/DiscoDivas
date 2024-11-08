@@ -16,9 +16,9 @@ For the album of disco music, please refer to this [spotify page](https://open.s
 Here is an example command line to run DiscoDivas.R
 
 ```
-Rscript DiscoDivas.R -m ukbb.pca.med.1000G.tsv \
+Rscript DiscoDivas.R -m file/med.g1000G.4pop.tsv \
 -p ukbb.pca.txt.gz \
---prs.list afr.prs.tsv.gz,${wd}/sas.prs.tsv.gz,eas.prs.tsv.gz,eur.prs.tsv.gz \
+--prs.list afr.prs.tsv.gz,${wd}/eas.prs.tsv.gz,eur.prs.tsv.gz,sas.prs.tsv.gz \
 -s IID,PRS \
 -A 1,0.9,1,1 \
 --regress.PCA T \
@@ -26,7 +26,7 @@ Rscript DiscoDivas.R -m ukbb.pca.med.1000G.tsv \
 ```
 - `-m ukbb.pca.med.1000G.tsv`
   
-  `ukbb.pca.med.1000G.tsv`can be found in the `files`. **Please notice that the order of the list after `-A` and `--prs.list` should has the same the order as the order of cohorts/ populations in this file.** User should replace the file by other file that contains the median value of top PC of the validation cohorts actually being used in the analysis.
+  `med.g1000G.4pop.tsv`can be found in the `files`. **Please notice that the order of the list after `-A` and `--prs.list` should has the same the order as the order of cohorts/ populations in this file.** User should replace the file by other file that contains the median value of top PC of the validation cohorts actually being used in the analysis.
   
   The format should be: 
   - must have a header; does't contain row name or row index;
@@ -34,9 +34,9 @@ Rscript DiscoDivas.R -m ukbb.pca.med.1000G.tsv \
 ```
   POP	PC1	PC2	PC3	PC4	PC5	PC6	PC7	PC8	PC9	PC10
   AFR	-8054.5169	855.90292	-956.67184	-13544.445	4926.9673	3771.2851	812.396557	-995.90085	-1181.98158	-1144.22429
-  ASN	14494.305	-6036.1673	4714.5286	-16009.741	5103.6832	4492.8499	1036.56551	-2046.52376	-1127.46504	-1249.9723
-  CHN	18201.946	10558.105	-1619.620231	-13121.892	6257.718	4450.8678	1118.970433	-2033.12265	-797.63404	-1553.94603
-  EUR	14634.677	-11959.621	-3110.3896	-11696.802	5096.9267	4264.5863	1074.55081	-1968.98792	-1316.456079	-1089.85971
+  EAS	14494.305	-6036.1673	4714.5286	-16009.741	5103.6832	4492.8499	1036.56551	-2046.52376	-1127.46504	-1249.9723
+  EUR	18201.946	10558.105	-1619.620231	-13121.892	6257.718	4450.8678	1118.970433	-2033.12265	-797.63404	-1553.94603
+  SAS	14634.677	-11959.621	-3110.3896	-11696.802	5096.9267	4264.5863	1074.55081	-1968.98792	-1316.456079	-1089.85971
   ```
     
 - `-p ukbb.pca.txt.gz`
@@ -47,7 +47,7 @@ Rscript DiscoDivas.R -m ukbb.pca.med.1000G.tsv \
   - must have header; does't contain row name or row index;
   - the first column is the individual ID; the seconds column and other columns after that are PCs
 
-- `--prs.list afr.prs.tsv.gz,${wd}/sas.prs.tsv.gz,eas.prs.tsv.gz,eur.prs.tsv.gz`
+- `--prs.list afr.prs.tsv.gz,${wd}/eas.prs.tsv.gz,eur.prs.tsv.gz,sas.prs.tsv.gz`
 
   The list of PRS files of the testing cohort that are based on the weight fine-tuned in each of the validation cohorts. They can be plain text file or `.gz` file. The format is:
   - must have header; does't contain row name or row index;
