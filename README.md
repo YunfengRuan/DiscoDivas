@@ -5,6 +5,9 @@ This page is for "a Genetic ***Dis***tance-assisted PRS ***Co***mbination Pipeli
 
 For the album of disco music, please refer to this [spotify page](https://open.spotify.com/album/511A9pZXN4GhblH021gdDS)
 
+## Prerint
+[Leveraging genetic ancestry continuum information to interpolate PRS for admixed populations](https://open.spotify.com/album/511A9pZXN4GhblH021gdDS)
+
 ## Required R packages
 - data.table
 - dplyr
