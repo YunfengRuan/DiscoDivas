@@ -54,7 +54,9 @@ option_list = list(
   make_option(c("-o", "--out"), type="character", default=NULL,
               help="the output name prefix", metavar="character"),
   make_option(c("--regress.PCA"), type="logical", default=TRUE,
-              help="choose weather regress out PCA from the PRS before combining them", metavar="character")
+              help="choose weather regress out PCA from the PRS before combining them", metavar="character"),
+  make_option(c("--print.coef"), type="logical", default=TRUE,
+                help="choose weather print out the interpolation coefficients", metavar="character")
 );
 
 opt_parser = OptionParser(option_list=option_list);
@@ -67,6 +69,7 @@ a.list <- opt$a.list
 select.col <- opt$select.col
 out <- opt$out
 regress.PCA <- as.logical(opt$regress.PCA)
+print.coef <- as.logical(opt$print.coef)
 
 cat("\ncheck the input:\n")
 Good.Input=TRUE
@@ -107,7 +110,7 @@ prs.list <- unlist(strsplit(prs.list, ","))}
 cat("\ncheck the sele-defined shrinkage parameters\n")
 if (is.null(a.list)) { A <- rep(1, N)} else {
 A <- as.numeric(unlist(strsplit(a.list, ",")))}
-if (any(is.na(A)) | any(A< 0) ) {
+if (any(is.na(A)) | any(A < 0) ) {
 cat("Error: Unexpected value in the a.list. Please check input \n")
 Good.Input=F}
 
@@ -135,6 +138,8 @@ cat("\nStart to calculate...\n")
 
 cat("\ngenerate the shrinkage parameter depends on the genetic distance of fine-tuning cohorts\n")
 d <- shrinkage.vector(med, npca)
+cat("\nthe shrinkage parameter is: \n")
+print(d)
 
 cat("\nCalculate genetic distance between fine-tuning cohorts and individuals in testing cohort\n")
 colnames(target.pca) <- c("IID", paste0("PC", seq(npca1)))
@@ -209,4 +214,9 @@ colnames(out.dat) <- c("IID", "PRS")
 export(out.dat, paste0(out, ".tsv.gz"), quote = F)
 cat("\nPRS combined! \n  Y(^ W ^)Y  \n")}
 cat(paste0("Result is written to ", out, ".tsv.gz\n"))
+
+if (print.coef){
+export(a.matrix, paste0(out, ".coef.tsv.gz"), quote = F)
+cat(paste0("Interpolation coefficient is written to ", out, ".interpolation.coef.tsv.gz\n"))}
+  
 }
