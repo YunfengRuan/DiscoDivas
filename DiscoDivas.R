@@ -193,7 +193,7 @@ if (regress.PCA){
 IID <- dat$IID
 prs.res.matrix <- data.frame(matrix(,nrow=nrow(dat),ncol=0))
 for (i in seq(N)) {
-prs.res <- scale(resid(glm(lm(formula = as.formula(paste(base.list[i], " ~", paste(paste0("PC", seq(10), collapse = "+")))),data = dat))))
+prs.res <- scale(resid(glm(lm(formula = as.formula(paste(base.list[i], " ~", paste(paste0("PC", seq(npca), collapse = "+")))),data = dat))))
 prs.res.matrix <- cbind(prs.res.matrix, prs.res)}
 prs.res.matrix <- cbind(IID, prs.res.matrix)
 colnames(prs.res.matrix) <- c("IID", paste0(base.list, ".res"))
