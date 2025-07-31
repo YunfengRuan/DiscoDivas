@@ -217,6 +217,6 @@ cat(paste0("Result is written to ", out, ".tsv.gz\n"))
 
 if (print.coef){
 export(a.matrix, paste0(out, ".coef.tsv.gz"), quote = F)
-cat(paste0("Interpolation coefficient is written to ", out, ".interpolation.coef.tsv.gz\n"))}
+cat(paste0("Interpolation coefficient is written to ", out, ".coef.tsv.gz\n"))}
   
 }
