@@ -76,7 +76,7 @@ SAS	1276.87	-1124.26	4017.77	1557.19	200.125	25.1516	-195.331	-349.297	-417.462	
 ## Supporting files
 Please visit `files` for the suppporting files
 
-Please visit `supplemental' for scripts to generate figures in the manuscripts and other related analyses involved in the manuscripts
+Please visit `supplemental` for scripts to generate figures in the manuscript and other scripts involved in generating PRS and calculating  PRS performance metrics in the manuscript
 
 
 
