@@ -108,8 +108,7 @@ dev.off()
 comp <- data.frame(PRS = character(), pop=character(), PHENO=character(), 
 BETA=double(), SE=double(), P=double(), Adj.R2=double(), N=integer())
 for (tag in c("BMI", "SBP", "DBP", "hdladj", "ldladj", "choladj", "logtg")) {
-dat <- fread(paste0(tag,".fig3.result.tsv"))
-
+dat <- fread(paste0("../data/", tag,".2.result.tsv"))
 comp <- rbind(comp, dat)
 }
 
@@ -125,14 +124,18 @@ max <- comp[PRS!="DD" & PRS!="tbd" , ] %>%
 comp1 <- merge(mix, match, by =c("pop", "PHENO"))
 comp1$increase <- (comp1$Adj.R2.x - comp1$Adj.R2.y)/ comp1$Adj.R2.y
 
-comp1$sig <- "no"
+comp1$sig <- "NS"
 for (POP in (unique(comp1$pop))){
 old <- comp1[pop==POP, ]$Adj.R2.y
 new <- comp1[pop==POP, ]$Adj.R2.x
 p = t.test(old, new, paired = TRUE)$p.value       
 print(paste(POP, p, mean(comp1[pop==POP, ]$increase)))
-comp1[pop==POP, ]$sig <- ifelse(p<0.05 & mean(old) < mean(new), "yes.pos", comp1[pop==POP, ]$sig)
-comp1[pop==POP, ]$sig <- ifelse(p<0.05 & mean(old) > mean(new), "yes.neg", comp1[pop==POP, ]$sig)
+comp1[pop==POP, ]$sig <- ifelse(p<0.05 & mean(old) < mean(new), "+*", comp1[pop==POP, ]$sig)
+comp1[pop==POP, ]$sig <- ifelse(p<0.05 & mean(old) > mean(new), "-*", comp1[pop==POP, ]$sig)
+comp1[pop==POP, ]$sig <- ifelse(p<0.01 & mean(old) < mean(new), "+**", comp1[pop==POP, ]$sig)
+comp1[pop==POP, ]$sig <- ifelse(p<0.01 & mean(old) > mean(new), "-**", comp1[pop==POP, ]$sig)
+comp1[pop==POP, ]$sig <- ifelse(p<0.001 & mean(old) < mean(new), "+***", comp1[pop==POP, ]$sig)
+comp1[pop==POP, ]$sig <- ifelse(p<0.001 & mean(old) > mean(new), "-***", comp1[pop==POP, ]$sig)
 }
 
 fontsize = 10
@@ -140,41 +143,59 @@ fontsize = 10
 comp1$pop <- ifelse(comp1$pop=="tbd", "OTH", comp1$pop)
 comp1$pop <- factor(comp1$pop, level = c("AFR", "EAS",  "SAS", "EUR", "AMR", "OTH"))
 phenolabel = c("BMI"="BMI", "SBP"="SBP", "DBP"="DBP", "choladj"="TC", "hdladj"="HDL", "ldladj"="LDL", "logtg"="lg(TG)")
-# colorlable = c("BMI"="#4575b4",  "DBP"="#74add1", "SBP"="#abd9e9", "choladj"="#fee090", "hdladj"="#fdae61", "ldladj"="#f46d43", "logtg"="#d73027")
 colorvalue = c("BMI"="#a6cee3",  "DBP"="#1f78b4", "SBP"="#b2df8a", "choladj"="#33a02c", "hdladj"="#fb9a99", "ldladj"="#e31a1c", "logtg"="#fdbf6f")
 
 comp1$increase2 <- ifelse(comp1$increase > 0.8, comp1$increase-0.4, comp1$increase)
 
-plot1 <-ggplot(comp1, aes(x=pop, y=increase2)) + 
+comp2 <- comp1 %>%
+group_by(pop) %>%
+summarise(
+    y_pos = max(increase2, na.rm = TRUE) +0.01,
+    sig = unique(sig),
+    .groups = "drop"
+  ) %>%
+ungroup()
+
+xpos=5.54
+ypos=0.37
+ystep=0.031
+fontsize2=9
+
+plot1 <- ggplot(comp1, aes(x=pop, y=increase2)) + 
     geom_violin(linewidth=0.15, position=position_dodge(), width=0.3, scale="width") +
     geom_abline(linewidth=0.5, alpha=0.3, slope =0, intercept=0) +
     geom_beeswarm(aes(color = PHENO), cex=2, size=2, 
                 priority="ascending", dodge.width = 0, groupOnX = T)+
-    stat_summary(aes(linetype = sig), fun = mean, geom = "crossbar", width = 0.7, size=0.3) +
-    scale_linetype_manual(values = c("yes.pos" = "solid", "yes.neg" = "solid", "no"="dotted"), guide="none") +
+    stat_summary(fun = mean, geom = "crossbar", width = 0.7, size=0.3) +
     expand_limits(x = 0, y=0.02) +
+    geom_text(data=comp2, aes(x = pop, y = y_pos, label = sig),
+              inherit.aes = FALSE, vjust = 0, size = 4 ) +
     theme_classic() +
     theme(text = element_text(size=fontsize), 
           title = element_text(size=fontsize),
-          legend.title=element_blank()) +
+          legend.title=element_blank(),
+          legend.position=c(.87,.9)) +
     scale_color_manual(values = colorvalue, labels = phenolabel) +
     scale_y_continuous(labels = scales::percent) + scale_y_continuous(
     breaks = c(-0.1, 0, 0.1, 0.2, 0.3, 0.5, 0.55, 0.6),  # show "before and after" values
     labels = c("-10%", "0%", "10%","20%", "30%", "90%", "95%", "100%")
   ) +
     xlab("Target population") + 
-    ylab("Relative increase of DiscoDivas over conventional PRS") 
-
-
+    ylab(bquote('Relative '~R^2~'increase')) +
+    annotate("text", x = xpos, y=ypos, label= "+    increase", hjust = 0, size =fontsize2/.pt) + 
+    annotate("text", x = xpos, y=ypos-ystep, label= "-    decrease" , hjust = 0, size =fontsize2/.pt) +
+    annotate("text", x = xpos, y=ypos-2*ystep, label= "NS non-significant", hjust = 0, size =fontsize2/.pt) +
+    annotate("text", x = xpos, y=ypos-3*ystep, label= "*    P<0.05" , hjust = 0, size =fontsize2/.pt) + 
+    annotate("text", x = xpos, y=ypos-4*ystep, label= "**   P<0.01" , hjust = 0, size =fontsize2/.pt) 
+# annotate("text", x = xpos, y=ypos-5*ystep, label= "***: P<0.001", hjust = 1, size =fontsize/.pt) +
 show(plot1)
-grid.lines(y = unit(c(0.760, 0.775), "npc"),x = unit(c(0.075, 0.094), "npc"), gp = gpar(lwd =2))
-grid.lines(y = unit(c(0.738, 0.754), "npc"),x = unit(c(0.075, 0.094), "npc"), gp = gpar(lwd =2))
 
-pdf(paste0("/medpop/esp2/yruan/projects/disco.plot/quant.conven.increase2.pdf"),  width=8, height=6)
+pdf(paste0("/medpop/esp2/yruan/projects/disco.plot/update2.fig3.pdf"),  width=8, height=6)
 print(plot1)
-grid.lines(y = unit(c(0.756, 0.766), "npc"),x = unit(c(0.075, 0.075), "npc"), gp = gpar(lwd =2, col = "white"))
-grid.lines(y = unit(c(0.760, 0.775), "npc"),x = unit(c(0.065, 0.085), "npc"), gp = gpar(lwd =1.5))
-grid.lines(y = unit(c(0.748, 0.764), "npc"),x = unit(c(0.065, 0.085), "npc"), gp = gpar(lwd =1.5))
+adj = 0.005
+grid.lines(y = unit(c(0.756, 0.766), "npc"),x = unit(c(0.075 + adj, 0.075+ adj), "npc"), gp = gpar(lwd =2, col = "white"))
+grid.lines(y = unit(c(0.760, 0.775), "npc"),x = unit(c(0.065+ adj, 0.085+ adj), "npc"), gp = gpar(lwd =1.5))
+grid.lines(y = unit(c(0.748, 0.764), "npc"),x = unit(c(0.065+ adj, 0.085+ adj), "npc"), gp = gpar(lwd =1.5))
 
 dev.off()
 
